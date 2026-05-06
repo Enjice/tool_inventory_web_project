@@ -1,10 +1,12 @@
 import React from 'react';
+import { Button as AntButton, type ButtonProps as AntButtonProps } from 'antd';
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface ButtonProps extends Omit<AntButtonProps, 'danger' | 'htmlType' | 'loading' | 'size' | 'type' | 'variant'> {
   variant?: 'primary' | 'secondary' | 'danger';
   size?: 'sm' | 'md' | 'lg';
   isLoading?: boolean;
   children: React.ReactNode;
+  type?: React.ButtonHTMLAttributes<HTMLButtonElement>['type'];
 }
 
 export const Button: React.FC<ButtonProps> = ({
@@ -14,29 +16,33 @@ export const Button: React.FC<ButtonProps> = ({
   children,
   disabled,
   className = '',
+  type,
   ...props
 }) => {
-  const baseStyles = 'rounded-lg font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed';
-  
-  const variants = {
-    primary: 'bg-blue-600 text-white hover:bg-blue-700',
-    secondary: 'bg-gray-200 text-gray-800 hover:bg-gray-300',
-    danger: 'bg-red-600 text-white hover:bg-red-700',
-  };
-  
-  const sizes = {
-    sm: 'px-3 py-1.5 text-sm',
-    md: 'px-4 py-2 text-base',
-    lg: 'px-6 py-3 text-lg',
-  };
-  
+  const antSizes = {
+    sm: 'small',
+    md: 'middle',
+    lg: 'large',
+  } as const;
+
+  const antTypes = {
+    primary: 'primary',
+    secondary: 'default',
+    danger: 'primary',
+  } as const;
+
   return (
-    <button
-      className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${className}`}
-      disabled={disabled || isLoading}
+    <AntButton
+      className={className}
+      danger={variant === 'danger'}
+      disabled={disabled}
+      htmlType={type}
+      loading={isLoading}
+      size={antSizes[size]}
+      type={antTypes[variant]}
       {...props}
     >
-      {isLoading ? 'Loading...' : children}
-    </button>
+      {children}
+    </AntButton>
   );
 };

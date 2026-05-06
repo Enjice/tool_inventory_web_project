@@ -1,26 +1,36 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Layout as AntLayout, Menu, Typography } from 'antd';
+import { Link, useLocation } from 'react-router-dom';
 
 export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const location = useLocation();
+
+  const navItems = [
+    { key: '/', label: <Link to="/">Catalog</Link> },
+    { key: '/favorites', label: <Link to="/favorites">Favorites</Link> },
+    { key: '/add', label: <Link to="/add">Add Tool</Link> },
+  ];
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-md">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex justify-between items-center">
-            <Link to="/" className="text-2xl font-bold text-blue-600">
+    <AntLayout className="min-h-screen">
+      <AntLayout.Header className="!h-auto !bg-white !px-0 shadow-sm">
+        <div className="container mx-auto flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
+          <Link to="/">
+            <Typography.Title className="!mb-0" level={3}>
               Tool Inventory
-            </Link>
-            <nav className="flex gap-6">
-              <Link to="/" className="text-gray-600 hover:text-blue-600">Catalog</Link>
-              <Link to="/favorites" className="text-gray-600 hover:text-blue-600">Favorites</Link>
-              <Link to="/add" className="text-gray-600 hover:text-blue-600">Add Tool</Link>
-            </nav>
-          </div>
+            </Typography.Title>
+          </Link>
+          <Menu
+            className="min-w-0 flex-1 justify-end border-0"
+            items={navItems}
+            mode="horizontal"
+            selectedKeys={[location.pathname]}
+          />
         </div>
-      </header>
-      <main className="container mx-auto px-4 py-8">
+      </AntLayout.Header>
+      <AntLayout.Content className="container mx-auto px-4 py-8">
         {children}
-      </main>
-    </div>
+      </AntLayout.Content>
+    </AntLayout>
   );
 };

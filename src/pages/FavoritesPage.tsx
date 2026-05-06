@@ -1,4 +1,5 @@
 import React from 'react';
+import { Typography } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { ToolList } from '../components/tools/ToolList';
 import { useTools } from '../hooks/useTools';
@@ -17,8 +18,10 @@ export const FavoritesPage: React.FC = () => {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Favorite Tools</h1>
-        <p className="text-gray-600 mt-2">Pinned tools with their condition and availability.</p>
+        <Typography.Title level={1}>Favorite Tools</Typography.Title>
+        <Typography.Paragraph type="secondary">
+          Pinned tools with their condition and availability.
+        </Typography.Paragraph>
       </div>
       <ToolList
         tools={favorites}

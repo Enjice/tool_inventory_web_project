@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Typography } from 'antd';
 import { useNavigate, useParams } from 'react-router-dom';
 import type { CreateToolDTO } from '../api/types';
 import { ToolForm } from '../components/tools/ToolForm';
@@ -35,12 +36,12 @@ export const ToolFormPage: React.FC = () => {
   return (
     <div className="max-w-2xl mx-auto">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">
+        <Typography.Title level={1}>
           {id ? 'Edit Tool' : 'Add New Tool'}
-        </h1>
-        <p className="text-gray-600 mt-2">
+        </Typography.Title>
+        <Typography.Paragraph type="secondary">
           {id ? 'Update tool details and availability.' : 'Add a tool to inventory.'}
-        </p>
+        </Typography.Paragraph>
       </div>
 
       <ToolForm

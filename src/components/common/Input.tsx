@@ -1,11 +1,20 @@
 import React from 'react';
+import { Form, Input as AntInput, Select } from 'antd';
 
-interface InputProps extends React.InputHTMLAttributes<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement> {
+interface InputProps {
+  className?: string;
+  disabled?: boolean;
   label?: string;
   error?: string;
   multiline?: boolean;
+  name?: string;
+  onChange?: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>;
   options?: { value: string; label: string }[];
+  placeholder?: string;
   rows?: number;
+  step?: string;
+  type?: string;
+  value?: string | number;
 }
 
 export const Input: React.FC<InputProps> = ({
@@ -16,46 +25,61 @@ export const Input: React.FC<InputProps> = ({
   className = '',
   ...props
 }) => {
-  const baseStyles = 'w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 transition-all duration-200';
-  const errorStyles = error ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500 focus:border-transparent';
-  
   const renderInput = () => {
+    const { disabled, name, onChange, placeholder, rows, step, type, value } = props;
+
     if (multiline) {
       return (
-        <textarea
-          className={`${baseStyles} ${errorStyles} ${className}`}
-          {...(props as React.TextareaHTMLAttributes<HTMLTextAreaElement>)}
+        <AntInput.TextArea
+          className={className}
+          disabled={disabled}
+          name={name}
+          onChange={onChange as React.ChangeEventHandler<HTMLTextAreaElement>}
+          placeholder={placeholder}
+          rows={rows}
+          value={value}
         />
       );
     }
     
     if (options && props.type === 'select') {
       return (
-        <select className={`${baseStyles} ${errorStyles} ${className}`} {...(props as React.SelectHTMLAttributes<HTMLSelectElement>)}>
-          <option value="">Select...</option>
-          {options.map(option => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
+        <Select
+          className={className}
+          disabled={disabled}
+          onChange={(nextValue) => {
+            onChange?.({
+              target: { name, value: nextValue ?? '' },
+            } as React.ChangeEvent<HTMLSelectElement>);
+          }}
+          options={options}
+          placeholder="Select..."
+          value={value || undefined}
+        />
       );
     }
     
-    return <input className={`${baseStyles} ${errorStyles} ${className}`} {...(props as React.InputHTMLAttributes<HTMLInputElement>)} />;
+    return (
+      <AntInput
+        className={className}
+        disabled={disabled}
+        name={name}
+        onChange={onChange as React.ChangeEventHandler<HTMLInputElement>}
+        placeholder={placeholder}
+        step={step}
+        type={type}
+        value={value}
+      />
+    );
   };
   
   return (
-    <div className="mb-4">
-      {label && (
-        <label className="block mb-2 text-sm font-medium text-gray-700">
-          {label}
-        </label>
-      )}
+    <Form.Item
+      help={error}
+      label={label}
+      validateStatus={error ? 'error' : undefined}
+    >
       {renderInput()}
-      {error && (
-        <p className="mt-1 text-sm text-red-600">{error}</p>
-      )}
-    </div>
+    </Form.Item>
   );
 };

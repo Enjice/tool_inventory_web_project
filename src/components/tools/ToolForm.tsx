@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { Alert, Card, Form, Space } from 'antd';
 import type { CreateToolDTO, Tool, ToolCondition, ToolStatus, ToolUser } from '../../api/types';
 import { Button } from '../common/Button';
 import { Input } from '../common/Input';
@@ -89,8 +90,8 @@ export const ToolForm: React.FC<ToolFormProps> = ({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: React.FormEvent) => {
+    e?.preventDefault();
 
     if (!validate()) return;
 
@@ -142,134 +143,140 @@ export const ToolForm: React.FC<ToolFormProps> = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6">
-      <Input
-        label="Tool Name"
-        name="name"
-        value={formData.name}
-        onChange={handleChange}
-        error={errors.name}
-        placeholder="Enter tool name"
-      />
-
-      <Input
-        label="Description"
-        name="description"
-        value={formData.description}
-        onChange={handleChange}
-        error={errors.description}
-        multiline
-        rows={4}
-        placeholder="Describe the tool"
-      />
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <Card>
+      <Form layout="vertical" onSubmitCapture={handleSubmit}>
         <Input
-          label="Category"
-          name="category"
-          value={formData.category}
+          error={errors.name}
+          label="Tool Name"
+          name="name"
           onChange={handleChange}
-          error={errors.category}
-          type="select"
-          options={categories}
+          placeholder="Enter tool name"
+          value={formData.name}
         />
-        <Input
-          label="Condition"
-          name="condition"
-          value={formData.condition}
-          onChange={handleChange}
-          type="select"
-          options={conditionOptions}
-        />
-      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Input
-          label="Price ($)"
-          name="price"
-          type="number"
-          value={formData.price}
+          error={errors.description}
+          label="Description"
+          multiline
+          name="description"
           onChange={handleChange}
-          error={errors.price}
-          step="0.01"
-          placeholder="0.00"
+          placeholder="Describe the tool"
+          rows={4}
+          value={formData.description}
         />
-        <Input
-          label="Quantity"
-          name="quantity"
-          type="number"
-          value={formData.quantity}
-          onChange={handleChange}
-          error={errors.quantity}
-          placeholder="0"
-        />
-      </div>
 
-      <Input
-        label="Image URL"
-        name="image_url"
-        value={formData.image_url}
-        onChange={handleChange}
-        placeholder="https://example.com/image.jpg"
-      />
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Input
-          label="Status"
-          name="status"
-          value={formData.status}
-          onChange={handleChange}
-          type="select"
-          options={statusOptions}
-        />
-        {formData.status === 'borrowed' && (
-          <div>
-            <Input
-              label="Borrowed by"
-              name="borrowed_by"
-              value={formData.borrowed_by}
-              onChange={handleChange}
-              error={errors.borrowed_by}
-              type="select"
-              options={userOptions}
-              disabled={userOptions.length === 0}
-            />
-            {userOptions.length === 0 && (
-              <p className="mt-[-0.5rem] mb-4 text-sm text-amber-700">
-                No users found in Supabase users table.
-              </p>
-            )}
-          </div>
-        )}
-      </div>
-
-      {formData.status === 'borrowed' && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Input
-            label="Borrowed at"
-            name="borrowed_at"
-            type="datetime-local"
-            value={formData.borrowed_at}
+            error={errors.category}
+            label="Category"
+            name="category"
             onChange={handleChange}
+            options={categories}
+            type="select"
+            value={formData.category}
           />
           <Input
-            label="Due date"
-            name="due_date"
-            type="datetime-local"
-            value={formData.due_date}
+            label="Condition"
+            name="condition"
             onChange={handleChange}
+            options={conditionOptions}
+            type="select"
+            value={formData.condition}
           />
         </div>
-      )}
 
-      <div className="flex gap-3 mt-6">
-        <Button type="submit" isLoading={isLoading}>
-          {isEditMode ? 'Update Tool' : 'Add Tool'}
-        </Button>
-        <Button type="button" variant="secondary" onClick={() => window.history.back()}>
-          Cancel
-        </Button>
-      </div>
-    </form>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Input
+            error={errors.price}
+            label="Price ($)"
+            name="price"
+            onChange={handleChange}
+            placeholder="0.00"
+            step="0.01"
+            type="number"
+            value={formData.price}
+          />
+          <Input
+            error={errors.quantity}
+            label="Quantity"
+            name="quantity"
+            onChange={handleChange}
+            placeholder="0"
+            type="number"
+            value={formData.quantity}
+          />
+        </div>
+
+        <Input
+          label="Image URL"
+          name="image_url"
+          onChange={handleChange}
+          placeholder="https://example.com/image.jpg"
+          value={formData.image_url}
+        />
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Input
+            label="Status"
+            name="status"
+            onChange={handleChange}
+            options={statusOptions}
+            type="select"
+            value={formData.status}
+          />
+          {formData.status === 'borrowed' && (
+            <Input
+              disabled={userOptions.length === 0}
+              error={errors.borrowed_by}
+              label="Borrowed by"
+              name="borrowed_by"
+              onChange={handleChange}
+              options={userOptions}
+              type="select"
+              value={formData.borrowed_by}
+            />
+          )}
+        </div>
+
+        {formData.status === 'borrowed' && userOptions.length === 0 && (
+          <Alert
+            className="mb-4"
+            message="No users found in Supabase users table."
+            showIcon
+            type="warning"
+          />
+        )}
+
+        {formData.status === 'borrowed' && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Input
+              label="Borrowed at"
+              name="borrowed_at"
+              onChange={handleChange}
+              type="datetime-local"
+              value={formData.borrowed_at}
+            />
+            <Input
+              label="Due date"
+              name="due_date"
+              onChange={handleChange}
+              type="datetime-local"
+              value={formData.due_date}
+            />
+          </div>
+        )}
+
+        <Form.Item className="!mb-0 !mt-6">
+          <Space>
+            <Button type="submit" isLoading={isLoading}>
+              {isEditMode ? 'Update Tool' : 'Add Tool'}
+            </Button>
+            <Button type="button" variant="secondary" onClick={() => window.history.back()}>
+              Cancel
+            </Button>
+          </Space>
+        </Form.Item>
+      </Form>
+    </Card>
   );
 };

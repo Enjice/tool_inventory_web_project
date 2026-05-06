@@ -1,4 +1,5 @@
 import React from 'react';
+import { Spin } from 'antd';
 
 interface LoadingSpinnerProps {
   size?: 'sm' | 'md' | 'lg';
@@ -7,15 +8,12 @@ interface LoadingSpinnerProps {
 
 export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ size = 'md', message }) => {
   const sizes = {
-    sm: 'w-6 h-6',
-    md: 'w-10 h-10',
-    lg: 'w-16 h-16',
-  };
+    sm: 'small',
+    md: 'default',
+    lg: 'large',
+  } as const;
   
   return (
-    <div className="flex flex-col items-center justify-center p-8">
-      <div className={`${sizes[size]} border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin`} />
-      {message && <p className="mt-4 text-gray-600">{message}</p>}
-    </div>
+    <Spin className="flex justify-center p-8" size={sizes[size]} tip={message} />
   );
 };

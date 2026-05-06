@@ -1,39 +1,33 @@
 import React from 'react';
+import { Layout as AntLayout, Menu, Typography } from 'antd';
 import { Link, useLocation } from 'react-router-dom';
 
 export const Header: React.FC = () => {
   const location = useLocation();
   
   const navItems = [
-    { path: '/', label: 'Catalog' },
-    { path: '/favorites', label: 'Favorites' },
-    { path: '/add', label: 'Add Tool' },
+    { key: '/', label: <Link to="/">Catalog</Link> },
+    { key: '/favorites', label: <Link to="/favorites">Favorites</Link> },
+    { key: '/add', label: <Link to="/add">Add Tool</Link> },
   ];
   
   return (
-    <header className="bg-white shadow-md">
+    <AntLayout.Header className="!h-auto !bg-white !px-0 shadow-sm">
       <div className="container mx-auto px-4 py-4">
-        <div className="flex justify-between items-center">
-          <Link to="/" className="text-2xl font-bold text-blue-600">
-            Tool Inventory
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <Link to="/">
+            <Typography.Title className="!mb-0" level={3}>
+              Tool Inventory
+            </Typography.Title>
           </Link>
-          <nav className="flex gap-6">
-            {navItems.map((item) => (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={`transition-colors ${
-                  location.pathname === item.path
-                    ? 'text-blue-600 font-semibold'
-                    : 'text-gray-600 hover:text-blue-600'
-                }`}
-              >
-                {item.label}
-              </Link>
-            ))}
-          </nav>
+          <Menu
+            className="min-w-0 flex-1 justify-end border-0"
+            items={navItems}
+            mode="horizontal"
+            selectedKeys={[location.pathname]}
+          />
         </div>
       </div>
-    </header>
+    </AntLayout.Header>
   );
 };
