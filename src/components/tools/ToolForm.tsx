@@ -53,7 +53,7 @@ export const ToolForm: React.FC<ToolFormProps> = ({
 
   const statusOptions: { value: ToolStatus; label: string }[] = [
     { value: 'available', label: 'Available' },
-    { value: 'borrowed', label: 'Borrowed' },
+    { value: 'borrowed', label: 'Borrowed by user' },
     { value: 'maintenance', label: 'Maintenance' },
   ];
 
@@ -115,7 +115,27 @@ export const ToolForm: React.FC<ToolFormProps> = ({
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => {
+      if (name === 'status' && value === 'borrowed') {
+        return {
+          ...prev,
+          status: value as ToolStatus,
+          borrowed_at: prev.borrowed_at || toDateTimeLocal(new Date().toISOString()),
+        };
+      }
+
+      if (name === 'status' && value !== 'borrowed') {
+        return {
+          ...prev,
+          status: value as ToolStatus,
+          borrowed_by: '',
+          borrowed_at: '',
+          due_date: '',
+        };
+      }
+
+      return { ...prev, [name]: value };
+    });
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: '' }));
     }
