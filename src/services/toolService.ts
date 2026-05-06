@@ -1,59 +1,61 @@
-import { supabase } from '../lib/supabase';
-
-export interface Tool {
-  id: string;
-  name: string;
-  description: string;
-  category: string;
-  price: number;
-  quantity: number;
-  is_favorite: boolean;
-  image_url?: string;
-  created_at: string;
-}
+import type { CreateToolDTO, Tool, ToolUser, UpdateToolDTO } from '../api/types';
+import { supabaseRequest } from '../lib/supabase';
 
 class ToolService {
   async getAllTools() {
-    const { data, error } = await supabase
-      .from('tools')
-      .select('*')
-      .order('created_at', { ascending: false });
-    
-    if (error) throw error;
-    return data as Tool[];
+    const tools = await supabaseRequest<Tool[]>('tools', {
+      query: {
+        select: '*',
+        order: 'created_at.desc',
+      },
+    });
+    const users = await this.getUsers();
+
+    return tools.map((tool) => ({
+      ...tool,
+      borrower: users.find((user) => user.id === tool.borrowed_by) ?? null,
+    }));
   }
 
-  async createTool(tool: Omit<Tool, 'id' | 'created_at'>) {
-    const { data, error } = await supabase
-      .from('tools')
-      .insert([tool])
-      .select()
-      .single();
-    
-    if (error) throw error;
-    return data;
+  async getUsers() {
+    return supabaseRequest<ToolUser[]>('users', {
+      query: {
+        select: '*',
+        order: 'full_name.asc',
+      },
+    });
   }
 
-  async updateTool(id: string, updates: Partial<Tool>) {
-    const { data, error } = await supabase
-      .from('tools')
-      .update(updates)
-      .eq('id', id)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    return data;
+  async createTool(tool: CreateToolDTO) {
+    const [created] = await supabaseRequest<Tool[]>('tools', {
+      method: 'POST',
+      body: [tool],
+    });
+
+    return created;
+  }
+
+  async updateTool(id: string, updates: UpdateToolDTO) {
+    const [updated] = await supabaseRequest<Tool[]>('tools', {
+      method: 'PATCH',
+      query: {
+        id: `eq.${id}`,
+      },
+      body: updates,
+    });
+
+    return updated;
   }
 
   async deleteTool(id: string) {
-    const { error } = await supabase
-      .from('tools')
-      .delete()
-      .eq('id', id);
-    
-    if (error) throw error;
+    await supabaseRequest<Tool[]>('tools', {
+      method: 'DELETE',
+      query: {
+        id: `eq.${id}`,
+      },
+    });
   }
 }
 
 export const toolService = new ToolService();
+export type { Tool, ToolUser };

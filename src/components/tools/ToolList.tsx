@@ -3,7 +3,6 @@ import { Tool } from '../../api/types';
 import { ToolCard } from './ToolCard';
 import { LoadingSpinner } from '../common/LoadingSpinner';
 import { ErrorMessage } from '../common/ErrorMessage';
-import { Button } from '../common/Button';
 
 interface ToolListProps {
   tools: Tool[];

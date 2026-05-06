@@ -1,6 +1,25 @@
 import React from 'react';
-import { Tool } from '../../api/types';
+import type { Tool, ToolCondition, ToolStatus } from '../../api/types';
 import { Button } from '../common/Button';
+
+const statusLabels: Record<ToolStatus, string> = {
+  available: 'Available',
+  borrowed: 'Borrowed',
+  maintenance: 'Maintenance',
+};
+
+const conditionLabels: Record<ToolCondition, string> = {
+  good: 'Good',
+  needs_repair: 'Needs repair',
+  broken: 'Broken',
+  lost: 'Lost',
+};
+
+const statusStyles: Record<ToolStatus, string> = {
+  available: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  borrowed: 'bg-amber-50 text-amber-700 border-amber-200',
+  maintenance: 'bg-sky-50 text-sky-700 border-sky-200',
+};
 
 interface ToolCardProps {
   tool: Tool;
@@ -9,17 +28,44 @@ interface ToolCardProps {
   onToggleFavorite?: (id: string, currentState: boolean) => void;
 }
 
-export const ToolCard: React.FC<ToolCardProps> = ({ tool, onEdit, onDelete, onToggleFavorite }) => {
+const formatDate = (value: string | null) => {
+  if (!value) return null;
+
+  return new Intl.DateTimeFormat('en', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  }).format(new Date(value));
+};
+
+export const ToolCard: React.FC<ToolCardProps> = ({
+  tool,
+  onEdit,
+  onDelete,
+  onToggleFavorite,
+}) => {
+  const borrowerName = tool.borrower?.full_name ?? 'Not assigned';
+  const borrowedAt = formatDate(tool.borrowed_at);
+  const dueDate = formatDate(tool.due_date);
+
   return (
     <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 overflow-hidden">
+      {tool.image_url && (
+        <img className="h-40 w-full object-cover" src={tool.image_url} alt={tool.name} />
+      )}
       <div className="p-5">
-        <div className="flex justify-between items-start mb-2">
-          <h3 className="text-lg font-semibold text-gray-900">{tool.name}</h3>
+        <div className="flex justify-between items-start gap-3 mb-3">
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900">{tool.name}</h3>
+            <p className="text-sm text-gray-500">{tool.category}</p>
+          </div>
           <button
-            onClick={() => onToggleFavorite?.(tool.id, tool.isFavorite)}
+            type="button"
+            aria-label="Toggle favorite"
+            onClick={() => onToggleFavorite?.(tool.id, tool.is_favorite)}
             className="text-yellow-500 hover:text-yellow-600 transition-colors"
           >
-            {tool.isFavorite ? (
+            {tool.is_favorite ? (
               <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24">
                 <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
               </svg>
@@ -30,14 +76,49 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, onEdit, onDelete, onTo
             )}
           </button>
         </div>
-        <p className="text-gray-600 text-sm mb-3">{tool.description}</p>
-        <div className="flex items-center justify-between text-sm mb-3">
-          <span className="text-gray-500">Category: {tool.category}</span>
-          <span className="font-semibold text-blue-600">${tool.price}</span>
+
+        <p className="text-gray-600 text-sm mb-4">{tool.description}</p>
+
+        <div className="flex flex-wrap gap-2 mb-4">
+          <span className={`rounded-full border px-3 py-1 text-xs font-semibold ${statusStyles[tool.status]}`}>
+            {statusLabels[tool.status]}
+          </span>
+          <span className="rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-xs font-semibold text-gray-700">
+            {conditionLabels[tool.condition]}
+          </span>
         </div>
-        <div className="flex items-center justify-between mb-4">
-          <span className="text-gray-500">Quantity: {tool.quantity}</span>
+
+        <div className="space-y-2 text-sm text-gray-600 mb-4">
+          <div className="flex items-center justify-between">
+            <span>Price</span>
+            <span className="font-semibold text-blue-600">${tool.price}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span>Quantity</span>
+            <span className="font-medium text-gray-900">{tool.quantity}</span>
+          </div>
+          {tool.status === 'borrowed' && (
+            <>
+              <div className="flex items-center justify-between gap-4">
+                <span>Borrowed by</span>
+                <span className="text-right font-medium text-gray-900">{borrowerName}</span>
+              </div>
+              {borrowedAt && (
+                <div className="flex items-center justify-between">
+                  <span>Borrowed at</span>
+                  <span className="font-medium text-gray-900">{borrowedAt}</span>
+                </div>
+              )}
+              {dueDate && (
+                <div className="flex items-center justify-between">
+                  <span>Due date</span>
+                  <span className="font-medium text-gray-900">{dueDate}</span>
+                </div>
+              )}
+            </>
+          )}
         </div>
+
         <div className="flex gap-2">
           <Button size="sm" variant="secondary" onClick={() => onEdit?.(tool.id)}>
             Edit

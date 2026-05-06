@@ -5,6 +5,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement | HTMLTe
   error?: string;
   multiline?: boolean;
   options?: { value: string; label: string }[];
+  rows?: number;
 }
 
 export const Input: React.FC<InputProps> = ({

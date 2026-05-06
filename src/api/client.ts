@@ -1,5 +1,11 @@
-import { supabase } from '../lib/supabase';
-import { Tool, CreateToolDTO, UpdateToolDTO, ApiResponse } from './types';
+import { supabaseRequest } from '../lib/supabase';
+import type { ApiResponse, ErrorResponse } from './types';
+
+type QueryOptions = {
+  orderBy?: string;
+  ascending?: boolean;
+  filters?: Record<string, string>;
+};
 
 class ApiClient {
   private static instance: ApiClient;
@@ -11,20 +17,21 @@ class ApiClient {
     return ApiClient.instance;
   }
 
-  async get<T>(table: string, query?: any): Promise<ApiResponse<T>> {
+  async get<T>(table: string, query?: QueryOptions): Promise<ApiResponse<T>> {
     try {
-      let supabaseQuery = supabase.from(table).select('*');
-      
+      const params: Record<string, string> = {
+        select: '*',
+        ...query?.filters,
+      };
+
       if (query?.orderBy) {
-        supabaseQuery = supabaseQuery.order(query.orderBy, { ascending: query.ascending ?? true });
+        params.order = `${query.orderBy}.${query.ascending === false ? 'desc' : 'asc'}`;
       }
-      
-      const { data, error } = await supabaseQuery;
-      
-      if (error) throw error;
-      
+
+      const data = await supabaseRequest<T>(table, { query: params });
+
       return {
-        data: data as T,
+        data,
         success: true,
       };
     } catch (error) {
@@ -34,16 +41,16 @@ class ApiClient {
 
   async getById<T>(table: string, id: string): Promise<ApiResponse<T>> {
     try {
-      const { data, error } = await supabase
-        .from(table)
-        .select('*')
-        .eq('id', id)
-        .single();
-      
-      if (error) throw error;
-      
+      const [data] = await supabaseRequest<T[]>(table, {
+        query: {
+          select: '*',
+          id: `eq.${id}`,
+          limit: '1',
+        },
+      });
+
       return {
-        data: data as T,
+        data,
         success: true,
       };
     } catch (error) {
@@ -51,18 +58,15 @@ class ApiClient {
     }
   }
 
-  async post<T>(table: string, data: any): Promise<ApiResponse<T>> {
+  async post<T>(table: string, data: unknown): Promise<ApiResponse<T>> {
     try {
-      const { data: result, error } = await supabase
-        .from(table)
-        .insert([{ ...data, createdAt: new Date(), updatedAt: new Date() }])
-        .select()
-        .single();
-      
-      if (error) throw error;
-      
+      const [result] = await supabaseRequest<T[]>(table, {
+        method: 'POST',
+        body: [data],
+      });
+
       return {
-        data: result as T,
+        data: result,
         success: true,
         message: 'Successfully created',
       };
@@ -71,19 +75,18 @@ class ApiClient {
     }
   }
 
-  async put<T>(table: string, id: string, data: any): Promise<ApiResponse<T>> {
+  async put<T>(table: string, id: string, data: unknown): Promise<ApiResponse<T>> {
     try {
-      const { data: result, error } = await supabase
-        .from(table)
-        .update({ ...data, updatedAt: new Date() })
-        .eq('id', id)
-        .select()
-        .single();
-      
-      if (error) throw error;
-      
+      const [result] = await supabaseRequest<T[]>(table, {
+        method: 'PATCH',
+        query: {
+          id: `eq.${id}`,
+        },
+        body: data,
+      });
+
       return {
-        data: result as T,
+        data: result,
         success: true,
         message: 'Successfully updated',
       };
@@ -94,13 +97,13 @@ class ApiClient {
 
   async delete(table: string, id: string): Promise<ApiResponse<null>> {
     try {
-      const { error } = await supabase
-        .from(table)
-        .delete()
-        .eq('id', id);
-      
-      if (error) throw error;
-      
+      await supabaseRequest<unknown[]>(table, {
+        method: 'DELETE',
+        query: {
+          id: `eq.${id}`,
+        },
+      });
+
       return {
         data: null,
         success: true,
@@ -111,11 +114,19 @@ class ApiClient {
     }
   }
 
-  private handleError(error: any): ErrorResponse {
+  private handleError(error: unknown): ErrorResponse {
     console.error('API Error:', error);
+
+    if (error instanceof Error) {
+      return {
+        message: error.message,
+        code: 'REQUEST_ERROR',
+      };
+    }
+
     return {
-      message: error.message || 'An unexpected error occurred',
-      code: error.code || 'UNKNOWN_ERROR',
+      message: 'An unexpected error occurred',
+      code: 'UNKNOWN_ERROR',
     };
   }
 }

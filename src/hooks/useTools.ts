@@ -1,64 +1,35 @@
-import { useState, useEffect } from 'react';
-import { toolService, Tool } from '../services/toolService';
+import { useEffect } from 'react';
+import type { Tool } from '../api/types';
+import { useToolStore } from '../store/toolStore';
 
 export const useTools = () => {
-  const [tools, setTools] = useState<Tool[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const loadTools = async () => {
-    try {
-      setLoading(true);
-      const data = await toolService.getAllTools();
-      setTools(data);
-      setError(null);
-    } catch (err) {
-      setError('Failed to load tools');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const addTool = async (tool: Omit<Tool, 'id' | 'created_at'>) => {
-    try {
-      const newTool = await toolService.createTool(tool);
-      setTools([newTool, ...tools]);
-      return true;
-    } catch (err) {
-      setError('Failed to add tool');
-      console.error(err);
-      return false;
-    }
-  };
-
-  const updateTool = async (id: string, updates: Partial<Tool>) => {
-    try {
-      const updated = await toolService.updateTool(id, updates);
-      setTools(tools.map(t => t.id === id ? updated : t));
-      return true;
-    } catch (err) {
-      setError('Failed to update tool');
-      console.error(err);
-      return false;
-    }
-  };
-
-  const deleteTool = async (id: string) => {
-    try {
-      await toolService.deleteTool(id);
-      setTools(tools.filter(t => t.id !== id));
-      return true;
-    } catch (err) {
-      setError('Failed to delete tool');
-      console.error(err);
-      return false;
-    }
-  };
+  const tools = useToolStore((state) => state.tools);
+  const users = useToolStore((state) => state.users);
+  const loading = useToolStore((state) => state.loading);
+  const error = useToolStore((state) => state.error);
+  const loadTools = useToolStore((state) => state.loadTools);
+  const addTool = useToolStore((state) => state.addTool);
+  const updateTool = useToolStore((state) => state.updateTool);
+  const deleteTool = useToolStore((state) => state.deleteTool);
+  const clearError = useToolStore((state) => state.clearError);
 
   useEffect(() => {
-    loadTools();
-  }, []);
+    if (tools.length === 0 && !loading) {
+      void loadTools();
+    }
+  }, [loadTools, loading, tools.length]);
 
-  return { tools, loading, error, addTool, updateTool, deleteTool, loadTools };
+  return {
+    tools,
+    users,
+    loading,
+    error,
+    addTool,
+    updateTool,
+    deleteTool,
+    loadTools,
+    clearError,
+  };
 };
+
+export type { Tool };
