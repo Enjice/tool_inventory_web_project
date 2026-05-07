@@ -1,7 +1,7 @@
 import React from 'react';
 import { DeleteOutlined, EditOutlined, StarFilled, StarOutlined } from '@ant-design/icons';
 import { Button, Card, Descriptions, Image, Space, Tag, Tooltip, Typography } from 'antd';
-import type { Tool, ToolCondition, ToolStatus } from '../../api/types';
+import type { Tool, ToolCondition, ToolStatus } from '../../types';
 
 const statusLabels: Record<ToolStatus, string> = {
   available: 'Available',
@@ -12,8 +12,6 @@ const statusLabels: Record<ToolStatus, string> = {
 const conditionLabels: Record<ToolCondition, string> = {
   good: 'Good',
   needs_repair: 'Needs repair',
-  broken: 'Broken',
-  lost: 'Lost',
 };
 
 const statusColors: Record<ToolStatus, string> = {
@@ -25,8 +23,6 @@ const statusColors: Record<ToolStatus, string> = {
 const conditionColors: Record<ToolCondition, string> = {
   good: 'success',
   needs_repair: 'warning',
-  broken: 'error',
-  lost: 'default',
 };
 
 interface ToolCardProps {
@@ -108,7 +104,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({
         </Space>
 
         <Descriptions column={1} size="small">
-          <Descriptions.Item label="Price">${tool.price}</Descriptions.Item>
+          <Descriptions.Item label="Price">₽{tool.price}</Descriptions.Item>
           <Descriptions.Item label="Quantity">{tool.quantity}</Descriptions.Item>
           {tool.status === 'borrowed' && (
             <>

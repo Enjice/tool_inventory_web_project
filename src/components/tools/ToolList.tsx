@@ -1,7 +1,7 @@
 import React from 'react';
 import { AppstoreOutlined } from '@ant-design/icons';
 import { Result } from 'antd';
-import { Tool } from '../../api/types';
+import { Tool } from '../../types';
 import { ToolCard } from './ToolCard';
 import { LoadingSpinner } from '../common/LoadingSpinner';
 import { ErrorMessage } from '../common/ErrorMessage';

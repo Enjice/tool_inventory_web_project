@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Typography } from 'antd';
 import { useNavigate, useParams } from 'react-router-dom';
-import type { CreateToolDTO } from '../api/types';
+import type { CreateToolDTO } from '../types';
 import { ToolForm } from '../components/tools/ToolForm';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
 import { useTools } from '../hooks/useTools';

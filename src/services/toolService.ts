@@ -1,4 +1,4 @@
-import type { CreateToolDTO, Tool, ToolUser, UpdateToolDTO } from '../api/types';
+import type { CreateToolDTO, Tool, ToolUser, UpdateToolDTO } from '../types';
 import { supabaseRequest } from '../lib/supabase';
 
 class ToolService {
@@ -10,7 +10,7 @@ class ToolService {
       },
     });
     const users = await this.getUsers();
-
+    // 3. Связываем заемщиков с инструментами
     return tools.map((tool) => ({
       ...tool,
       borrower: users.find((user) => user.id === tool.borrowed_by) ?? null,

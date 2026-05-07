@@ -21,6 +21,39 @@ A modern React application for managing your tool inventory with Supabase integr
 - Supabase for backend
 - React Router v6 for routing
 - Tailwind CSS for styling
-- Axios for API calls
+- API calls
 
 ## Project Structure
+
+```
+src/
+├── api/
+├── components/
+│   ├── common/
+│   │   ├── LoadingSpinner.tsx
+│   │   └── ...
+│   ├── tools/
+│   │   ├── ToolForm.tsx
+│   │   ├── ToolList.tsx
+│   │   └── ...
+│   └── ...
+├── hooks/
+│   └── useTools.ts
+├── pages/
+│   ├── CatalogPage.tsx
+│   ├── ToolFormPage.tsx
+│   ├── FavoritesPage.tsx
+│   └── ...
+├── types.ts
+├── App.tsx
+├── main.tsx
+└── ...
+```
+
+## Роутинг
+
+В `App.tsx` настроены маршруты на страницы:
+- `/` — `CatalogPage`
+- `/add` — `ToolFormPage` для создания
+- `/edit/:id` — `ToolFormPage` для редактирования
+- `/favorites` — `FavoritesPage`

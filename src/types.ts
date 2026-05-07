@@ -27,7 +27,7 @@ export interface ToolUser {
 
 export type ToolStatus = 'available' | 'borrowed' | 'maintenance';
 
-export type ToolCondition = 'good' | 'needs_repair' | 'broken' | 'lost';
+export type ToolCondition = 'good' | 'needs_repair';
 
 export type CreateToolDTO = {
   name: string;
@@ -48,13 +48,13 @@ export interface UpdateToolDTO extends Partial<CreateToolDTO> {
   is_favorite?: boolean;
 }
 
-export interface ApiResponse<T> {
-  data: T;
-  success: boolean;
-  message?: string;
-}
+// export interface ApiResponse<T> {
+//   data: T;
+//   success: boolean;
+//   message?: string;
+// }
 
-export interface ErrorResponse {
-  message: string;
-  code: string;
-}
+// export interface ErrorResponse {
+//   message: string;
+//   code: string;
+// }

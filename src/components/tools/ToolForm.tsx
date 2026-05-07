@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Alert, Card, Form, Space } from 'antd';
-import type { CreateToolDTO, Tool, ToolCondition, ToolStatus, ToolUser } from '../../api/types';
+import type { CreateToolDTO, Tool, ToolCondition, ToolStatus, ToolUser } from '../../types';
 import { Button } from '../common/Button';
 import { Input } from '../common/Input';
 
@@ -61,8 +61,6 @@ export const ToolForm: React.FC<ToolFormProps> = ({
   const conditionOptions: { value: ToolCondition; label: string }[] = [
     { value: 'good', label: 'Good' },
     { value: 'needs_repair', label: 'Needs repair' },
-    { value: 'broken', label: 'Broken' },
-    { value: 'lost', label: 'Lost' },
   ];
 
   const userOptions = useMemo(
@@ -188,7 +186,7 @@ export const ToolForm: React.FC<ToolFormProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Input
             error={errors.price}
-            label="Price ($)"
+            label="Price (₽)"
             name="price"
             onChange={handleChange}
             placeholder="0.00"

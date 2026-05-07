@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { CreateToolDTO, Tool, ToolUser, UpdateToolDTO } from '../api/types';
+import type { CreateToolDTO, Tool, ToolUser, UpdateToolDTO } from '../types';
 import { toolService } from '../services/toolService';
 
 interface ToolState {

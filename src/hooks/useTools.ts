@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import type { Tool } from '../api/types';
+import type { Tool } from '../types';
 import { useToolStore } from '../store/toolStore';
 
 export const useTools = () => {
