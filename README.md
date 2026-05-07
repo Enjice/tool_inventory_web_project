@@ -27,7 +27,6 @@ A modern React application for managing your tool inventory with Supabase integr
 
 ```
 src/
-├── api/
 ├── components/
 │   ├── common/
 │   │   ├── LoadingSpinner.tsx
